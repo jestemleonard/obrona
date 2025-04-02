@@ -36,6 +36,7 @@ Normalizacja polega na rozbijaniu baz danych na mniejsze i tworzeniu między nim
 | 2            | Adam Nowak   | Jajka   | Warszawa, ul. B 2 | 00-002      |
 | 2            | Adam Nowak   | Masło   | Warszawa, ul. B 2 | 00-002      |
 | 2            | Adam Nowak   | Mleko   | Warszawa, ul. B 2 | 00-002      |
+
 **2NF** wymaga, że dane zależne są od klucza głównego, a nie od jego części. Obecnie kluczem głównym jest **klucz kompozytowy** składający się z `ZamowienieID` oraz `Produkt`. W drugiej postaci normalnej rozbijamy tabelę na dwie:
 
 | ZamowienieID | Klient       | Adres             | KodPocztowy |
@@ -50,6 +51,7 @@ Normalizacja polega na rozbijaniu baz danych na mniejsze i tworzeniu między nim
 | 2            | Jajka   |
 | 2            | Masło   |
 | 2            | Mleko   |
+
 **3NF** - brak zależności przechodnich. Adres wskazuje na kod pocztowy, więc KodPocztowy jest zależny od Adresu, a nie od ZamowienieID. Możemy w takim razie wydzielić adresy do osobnej tabeli:
 
 | ZamowienieID | Klient       | Adres             |
@@ -69,6 +71,7 @@ Normalizacja polega na rozbijaniu baz danych na mniejsze i tworzeniu między nim
 | ----------------- | ----------- |
 | Kraków, ul. A 1   | 30-001      |
 | Warszawa, ul. B 2 | 00-002      |
+
 Ostatecznie ważną rzeczą tutaj jest to, że pierwsza postać normalna mówi, żeby w komórce była tylko jedna wartość. Druga mówi, żeby dane zależały od klucza, a nie od jego części. Trzecia mówi, że dane nie mogą należeć od siebie nawzajem, tak jak `Adres` i `KodPocztowy` - wystarczy tylko jedno w zamówieniu, a drugie wynika z niego i można je przenieść do innej tabeli. Żeby to wszystko zrozumieć warto zwrócić uwagę na to jak zmniejsza się ilość powtórzeń w tabelach i ułatwia się modyfikacja. BTW W tabeli z `ZamowienieID` i `Produkt` nic nie jest unikalne i tam jest `klucz kompozytowy` bo na przykład mleko w zamówieniu 1 jest innym wierszem niż mleko w zamówieniu 2 więc kombinacja obu kolumn tworzy unikalny klucz.
 # 10. Cykl życia produktu informatycznego. Zalety i wady modelu wodospadowego
 Cykl życia produktu informatycznego to etapy przez które przechodzi oprogramowanie. Po angielsku nazywa się to **Software Development Life Cycle - SDLC**. Składa się na niego:
