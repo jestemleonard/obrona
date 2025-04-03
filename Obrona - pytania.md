@@ -114,16 +114,16 @@ Myślę, że wystarczy wymienić kilka z nich i będzie ok.
 - Diagram aktywności - co po kolei się dzieje w programie. Przedstawia przebieg procesu i jego różne rozgałęzienia
 - Diagram stanów - przejścia stanów obiektów, czyli co po kolei dzieje się na przykład z zamówieniem (jest tworzone, opłacone, realizowane, nadawane, odebrane)
 # 14. Działania na macierzach
-Macierze można dodawać, ale tylko jeśli są tej samej wielkości. Dodaje się wtedy element po elemencie, czyli dodajemy te które znajdują się w tym samym miejscu w obu macierzach i ich suma będzie w tym samym miejscu w nowej macierzy. Mnożenie przez skalar to po prostu przez liczbę i wtedy każdy element jest przez tą liczbę mnożony. Dwie macierze można pomnożyć tylko jeśli ich "wewnętrzne" wymiary są takie same czyli dla AxB liczba kolumn `A` musi być taka sama jak wierszy `B`. Mnożenie macierzy nie jest przemienne. Macierz jednostkowa to takie 1 dla mnożenia zwykłego. Zapisujemy ją jako **`I`** i `A x I = A`. Taka macierz ma same jedynki na przekątnej, reszta to 0. Zawsze jest kwadratowa. Macierze można **transponować** czyli zmieniać wiersze z kolumnami. Pierwszy wiersz staje się pierwszą kolumną itd. Macierze kwadratowe można też odwracać, ale tylko jeśli mają wyznacznik różny od 0. Żeby odwrócić macierz `A` możemy ułożyć równanie `A × A⁻¹ = I` i rozwiązać. Jednym ze sposobów żeby to obliczyć jest ustawić macierz A i macierz I obok siebie i dodawać i odejmować wiersze tak, żeby z `A` zrobić macierz jednostkową i wszystkie te operacje powtarzać też na `I`. Na końcu I zmieni się w naszą macierz `A⁻¹`. Obliczanie wyznacznika w macierzy 2x2:
+Macierze można dodawać, ale tylko jeśli są tej samej wielkości. Dodaje się wtedy element po elemencie, czyli dodajemy te które znajdują się w tym samym miejscu w obu macierzach i ich suma będzie w tym samym miejscu w nowej macierzy. Mnożenie przez skalar to po prostu przez liczbę i wtedy każdy element jest przez tą liczbę mnożony. Dwie macierze można pomnożyć tylko jeśli ich "wewnętrzne" wymiary są takie same czyli dla AxB liczba kolumn `A` musi być taka sama jak wierszy `B`. Mnożenie macierzy nie jest przemienne. Macierz jednostkowa to takie 1 dla mnożenia zwykłego. Zapisujemy ją jako **`I`** i `A x I = A`. Taka macierz ma same jedynki na przekątnej, reszta to 0. Zawsze jest kwadratowa. Macierze można **transponować** czyli zmieniać wiersze z kolumnami. Pierwszy wiersz staje się pierwszą kolumną itd. Macierze kwadratowe można też odwracać, ale tylko jeśli mają wyznacznik różny od 0. Żeby odwrócić macierz `A` możemy ułożyć równanie $A × A⁻¹ = I$ i rozwiązać. Jednym ze sposobów żeby to obliczyć jest ustawić macierz A i macierz I obok siebie i dodawać i odejmować wiersze tak, żeby z `A` zrobić macierz jednostkową i wszystkie te operacje powtarzać też na `I`. Na końcu I zmieni się w naszą macierz `A⁻¹`. Obliczanie wyznacznika w macierzy 2x2:
 
-```r
+```
 | a b |
 | c d | → det = a*d - b*c
 ```
 
 Dla 3x3 liczyło się to tak:
 
-```r
+```
 | a b c |
 | d e f |
 | g h i | → det = a*e*i + b*f*g + c*d*h - c*e*g - b*d*i - a*f*h
@@ -131,8 +131,33 @@ Dla 3x3 liczyło się to tak:
 
 Bo trzeba sobie tak jakby dorysować tą macierz, bo ona się zapętla i wtedy możemy mieć trzy elementy na ukos. Na przykład tutaj mamy `b` i `f` ukośnie, ale brakuje nam trzeciego elementu, więc przepisujemy to `g` na dole, bo dół to `g h i` więc to się "zapętla" i następnym elementem znowu będzie `g` i wtedy dopełnia ono przekątną `b f g`. 
 # 15. Metody rozwiązywania układów równań liniowych
+Równania liniowe to takie, gdzie zmienne są tylko w pierwszej potędze. Układy tych równań oznaczają, że są co najmniej dwa równania. Żeby dało się je rozwiązać musi być przynajmniej tyle równań co zmiennych. Można je przedstawić przy pomocy macierzy. Łatwym sposobem rozwiązania ich jest podstawianie, czyli jedno równanie sprowadzamy do postaci, w której z jednej strony jest tylko jedna zmienna, a z drugiej cała reszta. Wtedy w drugim równaniu za tą zmienną przedstawiamy drugą stronę równania i wtedy mamy równanie jednej zmiennej, które możemy rozwiązać. Jak znamy już jedną zmienną to rozwiązujemy drugie równanie podstawiając rozwiązanie za zmienną i mamy drugą. Druga opcja to metoda eliminacji. Manipulujemy równaniem przez mnożenie **obu** stron tak, żeby jedna zmienna była przeciwnego znaku w tym równaniu co w drugim i je dodajemy do siebie i zostaje nam równanie jednej zmiennej. Jest też eliminacja Gauss'a, ale tam się podstawia pod macierze i próbuje uzyskać układ trójkątny i dużo roboty i tłumaczenia więc najlepiej o tym nie wspominać.
 # 16. Metody reprezentacji grafów
+Graf to struktura danych złożona z wierzchołków i krawędzi. Łatwiej to zrozumieć jako punkty i ich połączenia. Krawędzie (połączenia) mogą być skierowane (drogi jednokierunkowe), nieskierowane (drogi dwukierunkowe), albo ważone (czasem droga jest pod górkę, więc ciężej jest gdzieś się dostać). Można je przedstawić na **macierzy sąsiedztwa** (adjacency matrix) gdzie używamy tablicy `NxN` gdzie N to liczba wierzchołków. Wartość `1` albo jakaś inna w przypadku krawędzi ważonych oznacza istnienie krawędzi pomiędzy wierzchołkami. Przykład nieskierowanego grafu z wierzchołkami A, B, C:
+
+```
+   A B C
+A [0 1 1]
+B [1 0 0]
+C [1 0 0]
+```
+
+Na tym grafie istnieją połączenia pomiędzy `A` i `B` oraz `C`, ale żadne inne. Wynika to z tego, że `1` są na punktach wspólnych `A` z pozostałymi wierzchołkami, ale nie ma żadnych krawędzi pomiędzy `B`, a `C`. Jest to prosta i szybka implementacja, ale zajmuje dużo pamięci. Drugą opcją jest **lista sąsiedztwa** (adjacency list). Do każdego wierzchołka jest przypisana lista jego sąsiadów. Można to zaimplementować w C# jako `Dictionary<string, List<string>>`. Przykład dla takiego samego grafu jak poprzednio:
+
+```
+A: B, C  
+B: A  
+C: A 
+```
+
+To rozwiązanie jest bardzo popularne i oszczędza pamięć, ale sprawdzanie czy istnieje krawędź jest wolniejsze. Możemy też po prostu wypisać wszystkie krawędzie w grafie:
+
+```
+[(A, B), (A, C)]
+```
+
 # 17. Kolejki priorytetowe i metody ich realizacji
+Kolejka priorytetowa to struktura danych, w której każdy element ma przypisany priorytet. W przeciwieństwie do zwykłej kolejki FIFO czy LIFO, tutaj elementy są wyjmowane nie w kolejności dodania, ale w kolejności priorytetu – czyli najpierw wychodzą te najważniejsze. Najczęściej realizuje się to przy użyciu kopca binarnego, co pozwala na szybkie dodawanie i usuwanie elementów, ale opiera się na drzewie binarnym więc nie wchodzę w szczegóły. To rozwiązanie jest wbudowane w C# i realizowane przy użyciu klasy `PriorityQueue<TElement, TPriority>`. Można też użyć listy zawierającej elementy (para wartość i priorytet) i sortować ją po priorytecie po każdym dodaniu, ale to mniej wydajne. Kolejki priorytetowe są wykorzystywane np. w algorytmie Dijkstry, systemach kolejkowania zadań, grach czy systemach operacyjnych.
 # 18. Słowniki i metody ich realizacji
 # 19. Algorytmy sortowania
 # 20. Zadania, funkcje i protokoły warstwy sieciowej modelu OSI/ISO
@@ -234,7 +259,17 @@ W tym przypadku:
 
 Zaletą takiego podejścia jest to, że `Gracz` nie musi wiedzieć, co ma się stać po jego śmierci, tylko wystarczy, że „powie”, że zginął, a inne obiekty same zdecydują, jak na to zareagować.
 # 32. Pochodna funkcji jednej zmiennej. Definicja, zastosowanie do szukania ekstremów lokalnych
+Nie będę pisać jak się oblicza pochodną bo to powinno być oczywiste. Pochodna funkcji oznacza jej monotoniczność. Kiedy:
+- `f′(x) > 0` to funkcja rośnie
+- `f′(x) < 0` to funkcja maleje
+- `f′(x) = 0` to funkcja ma punkt krytyczny (który jest minimum, lub maksimum zależy czy wcześniej rosła czy malała albo czy później rośnie czy maleje całkiem intuicyjnie można to ogarnąć)
+Żeby wskazać czy ekstremum jest lokalne czy globalne najlepiej porównać te ekstrema, czyli podstawić sobie x i zobaczyć które maksimum jest największe, a które minimum jest najmniejsze i wtedy mamy ekstrema globalne.
 # 33. Całka nieoznaczone i całka oznaczona. Twierdzenie Newtona-Leibniza
+Całka nieoznaczona to odwrotność pochodnej. Wyznaczenie całki to tak naprawdę wyznaczenie każdej funkcji, której pochodna jest naszą oryginalną funkcją (dlatego na przykład mamy to `+ C` bo każda liczba może się tam znajdować bo i tak zniknie w pochodnej). Nie pamiętam na to żadnego wzoru, ale można tak na logikę przenieść sobie współczynnik przed niewiadomą do potęgi i dopisać `+ C` i powinno być ok. [Całka oznaczona](https://streamable.com/ar3vmz) to pole pod wykresem funkcji w przedziale `[a, b]` i zapisujemy ją tak:
+$∫ᵃᵇ f(x) dx$
+Twierdzenie Newtona-Leibniza mówi, że całkę oznaczoną można obliczyć za pomocą całki nieoznaczonej:
+$∫ᵃᵇ f(x) dx = F(b) − F(a)$
+czyli prostszymi słowami można powiedzieć, że całka oznaczona w przedziale `[a, b]` to wartość całki nieoznaczonej w punkcie `b` minus jej wartość w punkcie `a`. Można wspomnieć, że ze względu na definicję całki oznaczone ma ona zastosowanie do obliczania pól powierzchni.
 # 34. Szyfrowanie symetryczne i asymetryczne
 # 35. Istota i rodzaje podpisu elektronicznego
 # 36. Metody szyfrowania: steganografia, metody podstawiania, metody transpozycyjne
