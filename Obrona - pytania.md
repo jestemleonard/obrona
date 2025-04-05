@@ -184,8 +184,11 @@ Połączenie klient serwer nie jest równorzędne. Klient może tylko wysyłać 
 # 23. Technologie i rozwiązania dostępowe do sieci LAN
 **LAN** (**L**ocal **A**rea **N**etwork) to sieć lokalna. Chyba każdy taką ma w domu. Jest ona tworzona na przykład przez Ethernet albo Wi-Fi. Urządzenia w tej samej sieci widzą się i mogą się ze sobą komunikować (bez potrzeby "wychodzenia" do internetu). Pozwala to między innymi na dostęp do internetu, drukarek, serwerów, kamer czy plików ze wszystkich urządzeń w sieci. Można wspomnieć o VLAN, który jest technologią dzielenia dostępu w obrębie sieci LAN, co pozwala na separację urządzeń, albo o tym, że oprócz Ethernetu i Wi-Fi można też łączyć się przez Powerline, który przesyła dane przez instalację elektryczną. Nie wiem co tu więcej napisać po prostu trzeba lać wodę.
 # 24. Przykłady i zastosowanie adresowania warstwy łącza danych oraz warstwy sieci w sieciach typu Ethernet
+Pytanie o drugą i trzecią warstwę OSI w sieci LAN. Ethernet w sieci LAN używa adresów **MAC** do adresowania w warstwie łącza danych (warstwa 2), natomiast w warstwie sieci (warstwa 3) używa się adresów **IP**. MAC to fizyczny adres przypisany do karty sieciowej (np. `00:1A:2B:3C:4D:5E`) i pracują na nim switche. Służy on do komunikacji lokalnej. Adres IP (np. `192.168.1.5`) jest dynamiczny i pracują na nim routery. Służy on do komunikacji przez internet (zwykle). Kiedy urządzenie łączy się z drugim urządzeniem w tej samej sieci (np. `ssh 192.168.1.5`) to wtedy wysyła zapytanie do sieci o to kto ma ten adres IP, drugie urządzenie odpowiada swoim adresem MAC i komunikacja przebiega bezpośrednio między tymi dwoma urządzeniami przy użyciu MAC, bez udziału routera. Trochę inaczej to ujmując można powiedzieć, że IP to taki adres, a MAC to tożsamość. Adresy można zmieniać i kiedy chcemy się komunikować możemy stanąć na środku ulicy i krzyknąć pytanie kto mieszka pod tym adresem, a wtedy poznamy tożsamość mieszkańca i możemy prowadzić z nim już bezpośrednią rozmowę. Mam nadzieję, że ma to sens.
 # 25. Reguły dotyczące wyboru tzw. najlepszej trasy do sieci docelowej dla routingu statycznego
+Do tego ważne jest zrozumienie masek podsieci. Maski podsieci można zapisać na dwa sposoby: `255.255.255.0` oznacza to samo co `/24`. To znaczy, że trasa z maską `/24` doprowadzi do sieci, w której znajdują się maksymalnie 254 urządzenia (bo pierwsze 24 bity adresu wskazują na sieć, więc pozostaje nam 8 bitów na urządzenia w tej sieci). Router wybiera trasę, która wskazuje na jak najbardziej szczegółowy adres, czyli jak największa część tego adresu jest "zakryta" jedynkami, dlatego trasa z maską `/30` będzie preferowana przed maską `/8`. Jeśli kilka tras ma taką samą maskę, to zostanie wybrana trasa, która ma najniższą **metrykę** czyli wartość przypisaną trasie na podstawie np. kosztu, liczby przeskoków czy przepustowości. Jeśli dalej jest kilka tras które są takie same to router wybiera pierwszy numer interfejsu sieciowego np. `eth0` zamiast `eth1`. W przypadku kiedy brakuje pasującej trasy to router używa trasy domyślnej `0.0.0.0/0`. Ale skąd w ogóle biorą się te trasy? Niektóre router sam zna, bo na przykład ma interfejs `eth0` z IP `192.168.1.1/24` co znaczy, że zna całą sieć `192.168.1.0/24` bo jest jej częścią. Trasy statyczne (te o których mowa tym pytaniu) są wpisane ręcznie przez administratora i mówią coś w stylu "Jeśli chcesz dotrzeć do sieci `10.0.0.0/8`, idź przez `192.168.1.254`". Trasy dynamiczne pochodzą z routingu dynamicznego gdzie przy pomocy różnych protokołów routery wymieniają się informacjami między sobą (router który znam mówi, że zna drogę do innego routera, więc dodaję go do swojej tabeli).
 # 26. Przykłady realizacji koncepcji izolacji ruchu w sieciach dla warstwy łącza danych oraz warstwy sieci
+W **warstwie łącza danych** (warstwa 2) izolacja osiągana jest przez [[#21. VLAN - funkcje, zadania i zastosowanie|VLAN]]. Urządzenia w różnych sieciach VLAN nie widzą się nawzajem tak jakby były w osobnych sieciach. Realizowane są na switchach. W **warstwie sieci** (warstwa 3) izoluje się przez adresację i routing. Znaczy to, że tworzy się podsieci na przykład `192.168.1.0/24` dla jednego działu, a `192.168.2.0/24` dla drugiego. Reguły routingu i firewall mogą blokować ruch między tymi sieciami, albo pozwalać na wybrane połączenia.
 # 27. *Garbage Collection* w środowisku .Net. Cykl życia obiektu w języku C\#
 Garbage Collector w środowisku .Net automatycznie zarządza pamięcią więc nie trzeba się nim zbyt przejmować. Z punktu widzenia programisty pamięć jest zwalniana kiedy kończy się scope obiektu (zwykle scope jest w tych klamrach `{...}`). Śledzi wszystkie obiekty w pamięci i referencje do nich i usuwa te, które nie są nigdzie używane. GC działa na zasadzie generacji - Gen 0, Gen 1 i Gen 2. Obiekty nowo utworzone trafiają do Gen 0 i są często sprawdzane. Jeśli przetrwają kolejne przebiegi GC, są przenoszone do Gen 1, a następnie do Gen 2. GC sprawdza obiekty w Gen 0 najczęściej, w Gen 1 rzadziej, a w Gen 2 najrzadziej. Obiekty w Gen 2 to te, które żyją najdłużej np. dane globalne. GC usuwa obiekty, do których nie ma już referencji, na przykład po zakończeniu scopa. Można też wspomnieć o interfejsie `IDisposable`, ale ja się na tym nie znam, więc nie będę o tym więcej pisać. Coś tam ma wspólnego z ręcznym zwalnianiem zasobów takich jak pliki czy połączenia sieciowe.
 # 28. Typy wartościowe i referencyjne - podobieństwa, różnice i realizacja w języku C\#
@@ -290,14 +293,89 @@ Twierdzenie Newtona-Leibniza mówi, że całkę oznaczoną można obliczyć za p
 $∫ᵃᵇ f(x) dx = F(b) − F(a)$
 czyli prostszymi słowami można powiedzieć, że całka oznaczona w przedziale `[a, b]` to wartość całki nieoznaczonej w punkcie `b` minus jej wartość w punkcie `a`. Można wspomnieć, że ze względu na definicję całki oznaczone ma ona zastosowanie do obliczania pól powierzchni.
 # 34. Szyfrowanie symetryczne i asymetryczne
+Szyfrowanie symetryczne to jedno hasło dla obu stron komunikacji. Szyfrujemy i odszyfrowujemy tym samym kluczem. To wygodne i szybkie rozwiązanie, ale stanowi problem kiedy chcemy komuś udostępnić ten klucz. Przykładem tego może być na przykład plik ZIP zabezpieczony hasłem - każdy może go otworzyć jeśli zna hasło, które zostało użyte do zaszyfrowania go. Szyfrowanie asymetryczne (o wiele ciekawsze) składa się z dwóch kluczy: publicznego i prywatnego. Klucz publiczny chcemy udostępnić każdemu, a prywatny trzymamy tylko dla siebie. Każdą rzecz zaszyfrowaną kluczem publicznym można odszyfrować tylko przy użyciu klucza prywatnego. Dzięki temu można go łatwo używać w komunikacji. Jeśli osoba A chciałaby się komunikować z osobą B szyfrem, to może najpierw przesłać jej swój klucz publiczny kompletnie niezaszyfrowany, bo nic się nie dzieje jeśli inni ludzie go znają. Dzięki temu osoba B może wysłać wiadomość zaszyfrowaną kluczem publicznym A, którą może przeczytać tylko osoba która ma odpowiedni klucz prywatny, czyli osoba A. Po wstępnej wymianie kluczy te osoby mogą wymienić się zaszyfrowanymi kluczami symetrycznymi, które są szybsze i lepiej radzą sobie z dużymi plikami.
 # 35. Istota i rodzaje podpisu elektronicznego
+Podpis elektroniczny to forma podpisu, która pozwala zarówno potwierdzić tożsamość osoby jak i zapewnić, że dokument nie został zmieniony. Najpierw dokument, który chcemy podpisać zostaje przepuszczony przez funkcję hashującą, a następnie ten hash jest szyfrujący kluczem prywatnym. Ten zaszyfrowany hash to podpis elektroniczny, który każdy kto posiada klucz publiczny może odszyfrować i sprawdzić czy odszyfrowany hash zgadza się z hashem dokumentu. Tylko osoba posiadająca klucz prywatny może podpisać w taki sposób zaszyfrować hash, żeby można go było odszyfrować tym kluczem publicznym. Potwierdza to również, że dokument został podpisany w konkretnej formie, a nie został zmieniony, bo przy jakiejkolwiek modyfikacji dokumentu jego hash by się kompletnie zmienił i nie zgadzał się z tym, który został podpisany. Podpisem elektronicznym może być również zwykły zeskanowany podpis, ale nie posiada on mocy dowodowej. Zaawansowany podpis elektroniczny to taki jaki opisaliśmy, oparty o kryptografię. Kwalifikowany podpis elektroniczny jest dodatkowo zabezpieczony certyfikatem wydanym przez zaufanego dostawcę. Taki certyfikat jest prawnie równoznaczny z tradycyjnym podpisem (np. podpis profilem zaufanym).
 # 36. Metody szyfrowania: steganografia, metody podstawiania, metody transpozycyjne
+Są to "tradycyjne" sposoby szyfrowania znane od dawna. Steganografia to nie do końca szyfrowanie a ukrywanie informacji. Dane ukrywane są w innych danych na przykład obrazach, dźwiękach czy tekstach. Przykładem może być ukrywanie wiadomości w inicjałach wierszy, bitach pikseli czy w muzyce (ciekawy przykład: w "Cyberdemon" Mick'a Gordon'a na spektografie jest [ukryta wiadomość](https://i.ytimg.com/vi/yzFit0nldf4/hqdefault.jpg)). Wadą tego rozwiązania jest to, że jeśli ktoś znajdzie tą wiadomość to nie jest ona w żaden sposób zabezpieczona. Metody podstawiania polegają na zamianie znaku na inny według jakiegoś klucza. Świetnym i prostym przykładem jest szyfr cezara, który przesuwa każdą literę o kilka miejsc w alfabecie, albo trochę bardziej złożony szyfr Vigenère’a. Są one jednak łatwe do złamania metodami statystycznymi takimi jak sprawdzanie częstotliwości występowania liter. Metody transpozycyjne zmieniają kolejność znaków miejscami nie zmieniając samych znaków. Problemem tego podejścia jest łatwość złamania przy dłuższych wiadomościach. 
 # 37. Systemy IDS oraz IPS. Zalety i wady obydwu rozwiązań
+**IDS** (**I**ntrusion **D**etection **S**ystem) oraz **IPS** (**I**ntrusion **P**revention **S**ystem) to systemy bezpieczeństwa, które monitorują ruch sieciowy i reagują na zagrożenia. IDS wykrywa nieprawidłowości i podejrzaną aktywność w sieci lub systemie i wysyła powiadomienia do administratora. Z powodu braku bezpośredniej ingerencji ma on mniejszy wpływ na działanie systemu i nie blokuje fałszywych alarmów oraz nie wpływa na wydajność ruchu sieciowego. Problemem z tym systemem jest opóźniona reakcja, bo zanim człowiek dostanie powiadomienie, zapozna się z nim i je rozwiąże to minie trochę czasu. IPS zapobiega włamaniom czyli aktywnie podejmuje działania takie jak blokowanie pakietów, zrywanie połączeń czy banowanie adresów IP. Zaletą tego rozwiązania jest szybka ochrona w czasie rzeczywistym oraz to, że nie wymaga stałego nadzoru człowieka. Minusem jest większa złożoność, a co za tym idzie obciążenie sieci, oraz potencjał do zablokowania fałszywych alarmów.
 # 38. Wyjaśnij pojęcia: kryptologia, kryptografia i kryptoanaliza
+Kryptologia to ogólna dziedzina wiedzy zajmująca się ukrywaniem, zabezpieczaniem i łamaniem zabezpieczeń. Dzieli się na dwie główne gałęzie: kryptografię i kryptoanalizę. Kryptografia to zabezpieczanie danych na przykład szyfrowanie, podpisy elektroniczne, certyfikaty, czy bezpieczne protokoły wymiany informacji (np. HTTPS). Z kolei kryptoanaliza to odwrotna strona kryptografii. Zajmuje się analizowaniem i łamaniem metod kryptograficznych. Celem jest odzyskanie informacji bez znajomości klucza szyfrującego, ale również sprawdzanie czy dana metoda szyfrowania jest bezpieczna.
 # 39. Planarność i kolorowanie grafów
+Graf planarny to taki, który da się narysować (na płaszczyźnie) bez krzyżowania krawędzi. Kwadrat, trójkąt, drzewo są planarne, natomiast na przykład graf K₅ (**K** - kompletny czyli gdzie każdy wierzchołek łączy się z każdym i **5** bo na pięciu wierzchołkach) nie jest planarny. Kolorowanie grafu to przypisanie koloru każdemu wierzchołkowi, tak aby żadne dwa sąsiadujące wierzchołki nie miały tego samego koloru. Liczba chromatyczna to minimalna liczba kolorów, która wystarczy do pokolorowania grafu. Dla drzewa jest to 2, dla trójkąta 3, a dla kwadratu 2. Dla każdego grafu planarnego liczba chromatyczna będzie zawsze mniejsza lub równa 4. Ciekawostką, która z tego wynika jest to, że mapę świata (która jest grafem planarnym) można pokolorować tak, żeby żadne dwa sąsiadujące kraje nie miały tego samego koloru, używając maksymalnie 4 kolorów.
 # 40. Algorytm szyfrowania RSA
+**RSA** (skrót od nazwisk twórców) to asymetryczny algorytm szyfrowania, czyli taki, który używa dwóch kluczy. Używany jest w systemach takich jak HTTPS, podpisy cyfrowe czy klucze SSH. Tworzenie klucza jest dość skomplikowane a w skrócie opiera się na iloczynie dwóch bardzo dużych liczb pierwszych. Rozłożenie ich iloczynu na czynniki jest praktycznie niemożliwe w rozsądnym czasie przy użyciu klasycznych komputerów, ale komputery kwantowe stanowią zagrożenie dla tej metody szyfrowania. Ciekawostka: z tego powodu powstają nowe metody szyfrowania nazywane *post quantum cryptography* jak ML-KEM (Module-Lattice-Based Key-Encapsulation Mechanism), które zostało ostatnio dodane do Chrome jako dodatkowy algorytm szyfrowania w komunikacji TLS.
 # 41. Charakterystyka i wykorzystanie wzorców projektowych
+Wzorce projektowe to znane i sprawdzone rozwiązania typowych problemów programistycznych, które występują w projektowaniu oprogramowania. Nie są one gotowym kodem, ale takim szablonem, który możemy dostosować do problemu, z którym się spotykamy. Typowym wzorcem projektowym jest **Singleton** - zapewnia on, że istnieje tylko jedna instancja danego typu. Używa się go często w konfiguracji czy loggerze. Przykładowa implementacja w Go:
+
+```go
+package config
+
+import "sync"
+
+var (
+	instance *Config
+	once     sync.Once
+)
+
+type Config struct {
+	AppName string
+	Port    int
+}
+
+func GetConfig() *Config {
+	once.Do(func() {
+		instance = &Config{
+			AppName: "MyApp",
+			Port:    8080,
+		}
+	})
+	return instance
+}
+```
+
+tworzy jednorazowo konfigurację i zapisuje ją do pojedynczej instancji, bo nie potrzeba nam kilku takich samych konfiguracji w programie. Kolejnym przykładem może być **Factory** które pozwala nam na tworzenie obiektu:
+
+```go
+type Animal interface {
+	Speak() string
+}
+
+type Dog struct{}
+func (d Dog) Speak() string { return "Woof!" }
+
+type Cat struct{}
+func (c Cat) Speak() string { return "Meow!" }
+
+func AnimalFactory(kind string) Animal {
+	if kind == "dog" {
+		return Dog{}
+	} else if kind == "cat" {
+		return Cat{}
+	}
+	return nil
+}
+```
+
+Takie factory tworzy obiekty (zwykle interfejsy) w zależności od warunku (np. konfiguracji) i ukrywa logikę tworzenia obiektu. Pozwala na tworzenie dynamicznych obiektów i łatwo podmienić implementację. Innymi przykładami znanych wzorców projektowych są: **Strategy** - pozwala podmienić zachowanie w czasie działania programu, czy **Observer** - powiadamia o zmianie stanu innego obiektu.
 # 42. Omów kreacyjne, strukturalne i behawioralne wzorce projektowe
+### Kreacyjne wzorce projektowe - dotyczą sposobu tworzenia obiektów, szczególnie wtedy, kiedy tworzenie jest złożone, zależne od kontekstu, albo wymaga ukrycia szczegółów implementacji
+- **Singleton** – zapewnia, że istnieje tylko jedna instancja danej klasy/obiektu (np. konfiguracja, logger).
+- **Factory Method** – deleguje tworzenie obiektów do metod, które mogą zwracać różne typy (np. na podstawie stringa).
+- **Builder** – pozwala tworzyć złożone obiekty krok po kroku (np. składanie zapytania SQL).
+- **Prototype** – tworzy nowe obiekty przez klonowanie istniejących.
+### Wzorce strukturalne - dotyczą organizacji klas i obiektów - jak ze sobą współpracują, jak można je elastycznie łączyć, rozbudowywać i podmieniać
+- **Adapter** – pozwala podłączyć do systemu obiekt, który ma „niewłaściwy interfejs” (np. stara biblioteka).
+- **Decorator** – dodaje nowe funkcjonalności do obiektów w czasie działania.
+- **Composite** – pozwala traktować pojedyncze obiekty i ich złożenia (np. foldery i pliki) w ten sam sposób.
+- **Facade** – upraszcza złożony system, dostarczając prosty interfejs (np. klient API ukrywający szczegóły żądań).
+### Wzorce behawioralne - opisują komunikację i interakcje między obiektami, czyli kto, kiedy i w jaki sposób ze sobą rozmawia.
+- **Observer** – jeden obiekt informuje wiele innych o zmianie stanu (np. GUI, eventy, pub-sub).
+- **Strategy** – pozwala podmieniać algorytmy w czasie działania (np. różne metody sortowania).
+- **Command** – encapsuluje żądanie jako obiekt, który można przekazać, zapisać lub cofnąć.
+- **State** – zmienia zachowanie obiektu w zależności od jego wewnętrznego stanu (np. automat do napojów).
+Ubierając to w słowa można powiedzieć, że wzorce projektowe dzielą się na trzy główne grupy: kreacyjne, strukturalne i behawioralne. Wzorce **kreacyjne** koncentrują się na sposobie tworzenia obiektów – na przykład Singleton, który zapewnia jedyną instancję obiektu, albo Factory, który decyduje, jaki obiekt utworzyć. Wzorce **strukturalne** zajmują się organizacją i relacjami między obiektami, np. Adapter pozwala dopasować niekompatybilny interfejs, a Decorator dodaje funkcjonalności bez zmiany kodu. Wzorce **behawioralne** opisują sposób komunikacji między obiektami – np. Observer informuje subskrybentów o zmianie stanu, a Strategy pozwala dynamicznie zmieniać zachowanie programu. Znajomość tych wzorców pozwala pisać kod bardziej elastyczny, czytelny i łatwiejszy do rozwijania.
 # 43. Zasady projektowania SOLID
 # 44. Wyjaśnij dlaczego JavaScript jest językiem skryptowym, funkcyjnym, proceduralnym i obiektowym
 # 45. Kaskadowość i dziedziczenie w języku CSS
